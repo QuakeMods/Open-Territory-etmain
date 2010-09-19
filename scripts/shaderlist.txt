@@ -105,8 +105,8 @@ xlab_props
 xlab_wall
 
 
-# XreaL - BEGIN
+# XreaL BEGIN
 #eX
 #reflex_layout
 #tr3b_parallax
-# XreaL - END
+# XreaL END
