@@ -206,6 +206,10 @@ field_t         fields[] = {
 
 	{"damageparent", FOFS(damageparent), F_LSTRING},
 
+	// XreaL BEGIN
+	{"name", FOFS(targetname), F_LSTRING},
+	// XreaL END
+
 	{NULL}
 };
 

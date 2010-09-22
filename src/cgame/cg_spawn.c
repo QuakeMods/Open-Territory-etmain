@@ -130,8 +130,13 @@ void SP_path_corner_2(void)
 
 	if(!*targetname)
 	{
-		CG_Error("path_corner_2 with no targetname at %s\n", vtos(origin));
-		return;
+		// XreaL BEGIN
+		if(!CG_SpawnString("name", "", &targetname))
+		// XreaL END
+		{
+			CG_Error("path_corner_2 with no targetname at %s\n", vtos(origin));
+			return;
+		}
 	}
 
 	if(numPathCorners >= MAX_PATH_CORNERS)
@@ -160,7 +165,12 @@ void SP_info_train_spline_main(void)
 
 	if(!CG_SpawnString("targetname", "", &targetname))
 	{
-		CG_Error("info_train_spline_main with no targetname at %s\n", vtos(origin));
+		// XreaL BEGIN
+		if(!CG_SpawnString("name", "", &targetname))
+		// XreaL END
+		{
+			CG_Error("info_train_spline_main with no targetname at %s\n", vtos(origin));
+		}
 	}
 
 	CG_SpawnString("target", "", &target);
