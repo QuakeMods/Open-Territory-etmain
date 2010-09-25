@@ -2368,7 +2368,7 @@ ________________________________________________________________________________
 ============================================================================================================
 */
 
-entityDef speaker
+entityDef target_speaker
 {
 	"editor_color"					"0 .7 .7"
 	"editor_mins"					"-8 -8 -8"
@@ -2389,7 +2389,7 @@ entityDef speaker
 	"editor_bool notteam"			"Hidden For Teamplay: when set to 1, entity will not spawn in 'Teamplay' and 'CTF' modes."
 	"editor_bool notsingle"			"Hidden For SP: when set to 1, entity will not spawn in Single Player mode (bot play mode)."
 	
-	"editor_var s_volume"			"UNSUPPORTED: override shader volume level."
+	"editor_var volume"				"UNSUPPORTED: override shader volume level."
 	"editor_var s_minDistance"		"UNSUPPORTED: override shader minDistance."
 	"editor_var s_maxDistance"		"UNSUPPORTED: override shader maxDistance."
 	"editor_var s_omni"				"UNSUPPORTED: force omnidirectional"
@@ -2397,7 +2397,8 @@ entityDef speaker
 	
 	"spawnclass"					"idSound"
 	
-	"s_sound"						"sound/feedback/hit.wav"
+	"noise"							"sound/feedback/hit.wav"
+	"volume"						"255"
 	"s_looping"						"0"
 	"s_waitfortrigger"				"0"
 	"s_global"						"0"
