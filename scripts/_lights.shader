@@ -1,3 +1,7 @@
+
+
+table neontable2 { snap { 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1 } }
+
 lights/redglow
 {	
 	{
