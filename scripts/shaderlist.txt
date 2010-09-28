@@ -107,6 +107,9 @@ xlab_wall
 
 # XreaL BEGIN
 #eX
+hipshot_sky
 #reflex_layout
-#tr3b_parallax
+qx_hod
+tr3b_parallax
+tr3b_lava
 # XreaL END

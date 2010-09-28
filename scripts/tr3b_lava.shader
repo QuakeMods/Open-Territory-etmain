@@ -15,15 +15,15 @@ textures/tr3b/lava/lava1
 	nolightmap
 	lava
 	 
-	q3map_surfaceLight 3000
+	q3map_surfaceLight 8000
 	q3map_lightRGB 1.0 0.58 0
 	q3map_lightImage textures/tr3b/lava/lava1
-	q3map_lightSubdivide 16
+	q3map_lightSubdivide 8
 
 	{
 		//blend add
 		map textures/tr3b/lava/lava1
-		translate time * 0.4
+		translate	time * -0.02 , time * 0.05
 	}
 }
 
