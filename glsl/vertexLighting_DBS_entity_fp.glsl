@@ -235,7 +235,7 @@ void	main()
 	// compute the light term
 #if defined(r_halfLambertLighting)
 	// http://developer.valvesoftware.com/wiki/Half_Lambert
-	float NL = clamp(dot(N, L), 0.0, 1.0) * 0.5 + 0.5;
+	float NL = dot(N, L) * 0.5 + 0.5;
 	NL *= NL;
 #elif defined(r_WrapAroundLighting)
 	float NL = clamp(dot(N, L) + r_WrapAroundLighting, 0.0, 1.0) / clamp(1.0 + r_WrapAroundLighting, 0.0, 1.0);
