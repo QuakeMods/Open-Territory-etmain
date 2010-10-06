@@ -41,6 +41,7 @@ void	main()
 	vec4 color = original;
 
 	// calculate chromatic aberration
+#if 0
 	vec2 redOffset = vec2(0.5, 0.25);
 	vec2 greenOffset = vec2(0.0, 0.0);
 	vec2 blueOffset = vec2(-0.5, -0.25);
@@ -48,6 +49,7 @@ void	main()
 	color.r = texture2D(u_CurrentMap, st + redOffset * r_FBufScale).r;
 	color.g = texture2D(u_CurrentMap, st + greenOffset * r_FBufScale).g;
 	color.b = texture2D(u_CurrentMap, st + blueOffset * r_FBufScale).b;
+#endif
 
 	// blend the vignette
 	vec4 vignette = texture2D(u_VignetteMap, stClamped);
