@@ -222,6 +222,7 @@ void	main()
 	color.rgb += specular;
 	
 	gl_FragColor = color;
+	//gl_FragColor = vec4(vec3(NL, NL, NL), diffuse.a);
 #else
 	
 	vec3 N;
@@ -244,5 +245,6 @@ void	main()
 #endif
 	
 	gl_FragColor = vec4(diffuse.rgb * (u_AmbientColor + u_LightColor * NL), diffuse.a);
+	//gl_FragColor = vec4(vec3(NL, NL, NL), diffuse.a);
 #endif
 }

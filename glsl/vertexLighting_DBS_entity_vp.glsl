@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2006-2009 Robert Beckebans <trebor_7@users.sourceforge.net>
+Copyright (C) 2006-2010 Robert Beckebans <trebor_7@users.sourceforge.net>
 
 This file is part of XreaL source code.
 
@@ -27,12 +27,20 @@ attribute vec4		attr_TexCoord0;
 attribute vec3		attr_Tangent;
 attribute vec3		attr_Binormal;
 attribute vec3		attr_Normal;
+
+attribute vec4		attr_Position2;
+attribute vec3		attr_Tangent2;
+attribute vec3		attr_Binormal2;
+attribute vec3		attr_Normal2;
+
 #if defined(r_VertexSkinning)
 attribute vec4		attr_BoneIndexes;
 attribute vec4		attr_BoneWeights;
 uniform int			u_VertexSkinning;
 uniform mat4		u_BoneMatrix[MAX_GLSL_BONES];
 #endif
+
+uniform float		u_VertexInterpolation;
 
 uniform mat4		u_DiffuseTextureMatrix;
 uniform mat4		u_NormalTextureMatrix;
@@ -139,17 +147,27 @@ vec4 DeformPosition(const vec4 pos, const vec3 normal, const vec2 st)
 	return deformed;
 }
 
+vec4 InterpolatePosition(vec4 from, vec4 to, float frac)
+{
+	return from + ((to - from) * frac);
+}
+
+vec3 InterpolateNormal(vec3 from, vec3 to, float frac)
+{
+	return normalize(from + ((to - from) * frac));
+}
+
 void	main()
 {
 	vec4 position;
+	vec3 tangent = vec3(0.0);
+	vec3 binormal = vec3(0.0);
+	vec3 normal = vec3(0.0);
 
 #if defined(r_VertexSkinning)
 	if(bool(u_VertexSkinning))
 	{
 		position = vec4(0.0);
-		vec3 tangent = vec3(0.0);
-		vec3 binormal = vec3(0.0);
-		vec3 normal = vec3(0.0);
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -171,35 +189,48 @@ void	main()
 
 		// transform vertex position into homogenous clip-space
 		gl_Position = u_ModelViewProjectionMatrix * position;
-		
-		// transform position into world space
-		var_Position = (u_ModelMatrix * position).xyz;
-		
-		#if defined(r_NormalMapping)
-		var_Tangent.xyz = (u_ModelMatrix * vec4(tangent, 0.0)).xyz;
-		var_Binormal.xyz = (u_ModelMatrix * vec4(binormal, 0.0)).xyz;
-		#endif
-		
-		var_Normal.xyz = (u_ModelMatrix * vec4(normal, 0.0)).xyz;
 	}
 	else
 #endif
 	{
-		position = DeformPosition(attr_Position, attr_Normal, attr_TexCoord0.st);
+		if(u_VertexInterpolation > 0.0)
+		{
+			position = InterpolatePosition(attr_Position, attr_Position2, u_VertexInterpolation);
+			
+			#if defined(r_NormalMapping)
+			tangent = InterpolateNormal(attr_Tangent, attr_Tangent2, u_VertexInterpolation);
+			binormal.xyz = InterpolateNormal(attr_Binormal, attr_Binormal2, u_VertexInterpolation);
+			#endif
+			
+			normal = InterpolateNormal(attr_Normal, attr_Normal2, u_VertexInterpolation);
+		}
+		else
+		{
+			position = attr_Position;
+			
+			#if defined(r_NormalMapping)
+			tangent = attr_Tangent;
+			binormal = attr_Binormal;
+			#endif
+			
+			normal = attr_Normal;
+		}
+	
+		position = DeformPosition(position, attr_Normal2.xyz, attr_TexCoord0.st);
 	
 		// transform vertex position into homogenous clip-space
 		gl_Position = u_ModelViewProjectionMatrix * position;
-	
-		// transform position into world space
-		var_Position = (u_ModelMatrix * position).xyz;
-	
-		#if defined(r_NormalMapping)
-		var_Tangent.xyz = (u_ModelMatrix * vec4(attr_Tangent, 0.0)).xyz;
-		var_Binormal.xyz = (u_ModelMatrix * vec4(attr_Binormal, 0.0)).xyz;
-		#endif
-		
-		var_Normal.xyz = (u_ModelMatrix * vec4(attr_Normal, 0.0)).xyz;
 	}
+	
+	// transform position into world space
+	var_Position = (u_ModelMatrix * position).xyz;
+
+	#if defined(r_NormalMapping)
+	var_Tangent.xyz = (u_ModelMatrix * vec4(tangent, 0.0)).xyz;
+	var_Binormal.xyz = (u_ModelMatrix * vec4(binormal, 0.0)).xyz;
+	#endif
+	
+	var_Normal.xyz = (u_ModelMatrix * vec4(normal, 0.0)).xyz;
 
 	// transform diffusemap texcoords
 	var_TexDiffuse = (u_DiffuseTextureMatrix * attr_TexCoord0).st;
