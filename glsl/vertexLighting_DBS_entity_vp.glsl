@@ -65,97 +65,56 @@ varying vec3		var_Binormal;
 varying vec3		var_Normal;
 
 
-float triangle(float x)
-{
-	return max(1.0 - abs(x), 0);
-}
+// function declarations --------------------------------------------------------------------------
 
-float sawtooth(float x)
-{
-	return x - floor(x);
-}
+vec4 DeformPosition(const int deformGen,
+					const vec4 wave,	// [base amplitude phase freq]
+					const vec3 bulge,	// [width height speed]
+					const float spread,
+					const float time,
+					const vec4 pos,
+					const vec3 normal,
+					const vec2 st);
+					
+void VertexSkinning_P_N(const vec4 boneIndexes,
+						const vec4 boneWeights,
+						const mat4 boneMatrices[MAX_GLSL_BONES],
+						
+						const vec4 inPosition,
+						const vec3 inNormal,
+						
+						inout vec4 position,
+						inout vec3 normal);
 
-vec4 DeformPosition(const vec4 pos, const vec3 normal, const vec2 st)
-{
-	vec4 deformed = pos;
-	
-	/*
-		define	WAVEVALUE( table, base, amplitude, phase, freq ) \
-			((base) + table[ Q_ftol( ( ( (phase) + backEnd.refdef.floatTime * (freq) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * (amplitude))
-	*/
+void VertexSkinning_P_TBN(	const vec4 boneIndexes,
+							const vec4 boneWeights,
+							const mat4 boneMatrices[MAX_GLSL_BONES],
+							
+							const vec4 inPosition,
+							const vec3 inTangent,
+							const vec3 inBinormal,
+							const vec3 inNormal,
+							
+							inout vec4 position, 
+							inout vec3 tangent, 
+							inout vec3 binormal, 
+							inout vec3 normal);
+							
+void VertexAnimation_P_N(	vec4 fromPosition, vec4 toPosition,
+							vec3 fromNormal, vec3 toNormal,
+							float frac,
+							inout vec4 position, inout vec3 normal);
 
-	if(u_DeformGen == DGEN_WAVE_SIN)
-	{
-		float off = (pos.x + pos.y + pos.z) * u_DeformSpread;
-		float scale = u_DeformWave.x  + sin(off + u_DeformWave.z + (u_Time * u_DeformWave.w)) * u_DeformWave.y;
-		vec3 offset = normal * scale;
+void VertexAnimation_P_TBN(	vec4 fromPosition, vec4 toPosition,
+							vec3 fromTangent, vec3 toTangent,
+							vec3 fromBinormal, vec3 toBinormal,
+							vec3 fromNormal, vec3 toNormal,
+							float frac,
+							inout vec4 position, inout vec3 tangent, inout vec3 binormal, inout vec3 normal);
 
-		deformed.xyz += offset;
-	}
-	
-	if(u_DeformGen == DGEN_WAVE_SQUARE)
-	{
-		float off = (pos.x + pos.y + pos.z) * u_DeformSpread;
-		float scale = u_DeformWave.x  + sign(sin(off + u_DeformWave.z + (u_Time * u_DeformWave.w))) * u_DeformWave.y;
-		vec3 offset = normal * scale;
+// end function declarations ----------------------------------------------------------------------
 
-		deformed.xyz += offset;
-	}
-	
-	if(u_DeformGen == DGEN_WAVE_TRIANGLE)
-	{
-		float off = (pos.x + pos.y + pos.z) * u_DeformSpread;
-		float scale = u_DeformWave.x  + triangle(off + u_DeformWave.z + (u_Time * u_DeformWave.w)) * u_DeformWave.y;
-		vec3 offset = normal * scale;
 
-		deformed.xyz += offset;
-	}
-	
-	if(u_DeformGen == DGEN_WAVE_SAWTOOTH)
-	{
-		float off = (pos.x + pos.y + pos.z) * u_DeformSpread;
-		float scale = u_DeformWave.x  + sawtooth(off + u_DeformWave.z + (u_Time * u_DeformWave.w)) * u_DeformWave.y;
-		vec3 offset = normal * scale;
-
-		deformed.xyz += offset;
-	}
-	
-	if(u_DeformGen == DGEN_WAVE_INVERSE_SAWTOOTH)
-	{
-		float off = (pos.x + pos.y + pos.z) * u_DeformSpread;
-		float scale = u_DeformWave.x + (1.0 - sawtooth(off + u_DeformWave.z + (u_Time * u_DeformWave.w))) * u_DeformWave.y;
-		vec3 offset = normal * scale;
-
-		deformed.xyz += offset;
-	}
-	
-	if(u_DeformGen == DGEN_BULGE)
-	{
-		float bulgeWidth = u_DeformBulge.x;
-		float bulgeHeight = u_DeformBulge.y;
-		float bulgeSpeed = u_DeformBulge.z;
-	
-		float now = u_Time * bulgeSpeed;
-
-		float off = (M_PI * 0.25) * st.x * bulgeWidth + now; 
-		float scale = sin(off) * bulgeHeight;
-		vec3 offset = normal * scale;
-
-		deformed.xyz += offset;
-	}
-
-	return deformed;
-}
-
-vec4 InterpolatePosition(vec4 from, vec4 to, float frac)
-{
-	return from + ((to - from) * frac);
-}
-
-vec3 InterpolateNormal(vec3 from, vec3 to, float frac)
-{
-	return normalize(from + ((to - from) * frac));
-}
 
 void	main()
 {
@@ -167,42 +126,34 @@ void	main()
 #if defined(r_VertexSkinning)
 	if(bool(u_VertexSkinning))
 	{
-		position = vec4(0.0);
-
-		for(int i = 0; i < 4; i++)
-		{
-			int boneIndex = int(attr_BoneIndexes[i]);
-			float boneWeight = attr_BoneWeights[i];
-			mat4  boneMatrix = u_BoneMatrix[boneIndex];
-			
-			position += (boneMatrix * attr_Position) * boneWeight;
-		
-			#if defined(r_NormalMapping)
-			tangent += (boneMatrix * vec4(attr_Tangent, 0.0)).xyz * boneWeight;
-			binormal += (boneMatrix * vec4(attr_Binormal, 0.0)).xyz * boneWeight;
-			#endif
-			
-			normal += (boneMatrix * vec4(attr_Normal, 0.0)).xyz * boneWeight;
-		}
-		
-		position = DeformPosition(position, attr_Normal, attr_TexCoord0.st);
-
-		// transform vertex position into homogenous clip-space
-		gl_Position = u_ModelViewProjectionMatrix * position;
+		#if defined(r_NormalMapping)
+		VertexSkinning_P_TBN(	attr_BoneIndexes, attr_BoneWeights, u_BoneMatrix,
+								attr_Position, attr_Tangent, attr_Binormal, attr_Normal,
+								position, tangent, binormal, normal);
+		#else
+		VertexSkinning_P_N(	attr_BoneIndexes, attr_BoneWeights, u_BoneMatrix,
+							attr_Position, attr_Normal,
+							position, normal);
+		#endif
 	}
 	else
 #endif
 	{
 		if(u_VertexInterpolation > 0.0)
 		{
-			position = InterpolatePosition(attr_Position, attr_Position2, u_VertexInterpolation);
-			
 			#if defined(r_NormalMapping)
-			tangent = InterpolateNormal(attr_Tangent, attr_Tangent2, u_VertexInterpolation);
-			binormal.xyz = InterpolateNormal(attr_Binormal, attr_Binormal2, u_VertexInterpolation);
+			VertexAnimation_P_TBN(	attr_Position, attr_Position2,
+									attr_Tangent, attr_Tangent2,
+									attr_Binormal, attr_Binormal2,
+									attr_Normal, attr_Normal2,
+									u_VertexInterpolation,
+									position, tangent, binormal, normal);
+			#else
+			VertexAnimation_P_N(attr_Position, attr_Position2,
+								attr_Normal, attr_Normal2,
+								u_VertexInterpolation,
+								position, normal);
 			#endif
-			
-			normal = InterpolateNormal(attr_Normal, attr_Normal2, u_VertexInterpolation);
 		}
 		else
 		{
@@ -215,12 +166,19 @@ void	main()
 			
 			normal = attr_Normal;
 		}
-	
-		position = DeformPosition(position, attr_Normal2.xyz, attr_TexCoord0.st);
-	
-		// transform vertex position into homogenous clip-space
-		gl_Position = u_ModelViewProjectionMatrix * position;
 	}
+	
+	position = DeformPosition(	u_DeformGen,
+								u_DeformWave,	// [base amplitude phase freq]
+								u_DeformBulge,	// [width height speed]
+								u_DeformSpread,
+								u_Time,
+								position,
+								normal,
+								attr_TexCoord0.st);
+
+	// transform vertex position into homogenous clip-space
+	gl_Position = u_ModelViewProjectionMatrix * position;
 	
 	// transform position into world space
 	var_Position = (u_ModelMatrix * position).xyz;
