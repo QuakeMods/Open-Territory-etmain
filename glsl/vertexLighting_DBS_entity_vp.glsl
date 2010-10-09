@@ -65,55 +65,6 @@ varying vec3		var_Binormal;
 varying vec3		var_Normal;
 
 
-// function declarations --------------------------------------------------------------------------
-
-vec4 DeformPosition(const int deformGen,
-					const vec4 wave,	// [base amplitude phase freq]
-					const vec3 bulge,	// [width height speed]
-					const float spread,
-					const float time,
-					const vec4 pos,
-					const vec3 normal,
-					const vec2 st);
-					
-void VertexSkinning_P_N(const vec4 boneIndexes,
-						const vec4 boneWeights,
-						const mat4 boneMatrices[MAX_GLSL_BONES],
-						
-						const vec4 inPosition,
-						const vec3 inNormal,
-						
-						inout vec4 position,
-						inout vec3 normal);
-
-void VertexSkinning_P_TBN(	const vec4 boneIndexes,
-							const vec4 boneWeights,
-							const mat4 boneMatrices[MAX_GLSL_BONES],
-							
-							const vec4 inPosition,
-							const vec3 inTangent,
-							const vec3 inBinormal,
-							const vec3 inNormal,
-							
-							inout vec4 position, 
-							inout vec3 tangent, 
-							inout vec3 binormal, 
-							inout vec3 normal);
-							
-void VertexAnimation_P_N(	vec4 fromPosition, vec4 toPosition,
-							vec3 fromNormal, vec3 toNormal,
-							float frac,
-							inout vec4 position, inout vec3 normal);
-
-void VertexAnimation_P_TBN(	vec4 fromPosition, vec4 toPosition,
-							vec3 fromTangent, vec3 toTangent,
-							vec3 fromBinormal, vec3 toBinormal,
-							vec3 fromNormal, vec3 toNormal,
-							float frac,
-							inout vec4 position, inout vec3 tangent, inout vec3 binormal, inout vec3 normal);
-
-// end function declarations ----------------------------------------------------------------------
-
 
 
 void	main()
