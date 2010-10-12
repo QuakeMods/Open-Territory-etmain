@@ -102,7 +102,8 @@ float RayIntersectDisplaceMap(vec2 dp, vec2 ds)
 
 void	main()
 {
-	if(bool(u_PortalClipping))
+#if defined(USE_PORTAL_CLIPPING)
+	//(bool(u_PortalClipping))
 	{
 		float dist = dot(var_Position.xyz, u_PortalPlane.xyz) - u_PortalPlane.w;
 		if(dist < 0.0)
@@ -111,6 +112,7 @@ void	main()
 			return;
 		}
 	}
+#endif
 
 #if defined(r_NormalMapping)
 	// invert tangent space for two sided surfaces
@@ -173,6 +175,8 @@ void	main()
 
 	// compute the diffuse term
 	vec4 diffuse = texture2D(u_DiffuseMap, texDiffuse);
+	
+#if defined(USE_ALPHA_TEST)
 	if(u_AlphaTest == ATEST_GT_0 && diffuse.a <= 0.0)
 	{
 		discard;
@@ -188,6 +192,7 @@ void	main()
 		discard;
 		return;
 	}
+#endif
 
 #if defined(r_NormalMapping)
 	// compute normal in world space from normalmap
@@ -246,5 +251,6 @@ void	main()
 	
 	gl_FragColor = vec4(diffuse.rgb * (u_AmbientColor + u_LightColor * NL), diffuse.a);
 	//gl_FragColor = vec4(vec3(NL, NL, NL), diffuse.a);
+	//gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), diffuse.a);
 #endif
 }

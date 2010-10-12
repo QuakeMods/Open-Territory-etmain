@@ -74,8 +74,7 @@ void	main()
 	vec3 binormal = vec3(0.0);
 	vec3 normal = vec3(0.0);
 
-#if defined(r_VertexSkinning)
-	if(bool(u_VertexSkinning))
+#if defined(USE_VERTEX_SKINNING)
 	{
 		#if defined(r_NormalMapping)
 		VertexSkinning_P_TBN(	attr_BoneIndexes, attr_BoneWeights, u_BoneMatrix,
@@ -87,8 +86,7 @@ void	main()
 							position, normal);
 		#endif
 	}
-	else
-#endif
+#elif defined(USE_VERTEX_ANIMATION)
 	{
 		if(u_VertexInterpolation > 0.0)
 		{
@@ -118,7 +116,20 @@ void	main()
 			normal = attr_Normal;
 		}
 	}
-	
+#else
+	{
+		position = attr_Position;
+		
+		#if defined(r_NormalMapping)
+		tangent = attr_Tangent;
+		binormal = attr_Binormal;
+		#endif
+		
+		normal = attr_Normal;
+	}
+#endif
+
+#if defined(USE_DEFORM_VERTEXES)
 	position = DeformPosition(	u_DeformGen,
 								u_DeformWave,	// [base amplitude phase freq]
 								u_DeformBulge,	// [width height speed]
@@ -127,6 +138,7 @@ void	main()
 								position,
 								normal,
 								attr_TexCoord0.st);
+#endif
 
 	// transform vertex position into homogenous clip-space
 	gl_Position = u_ModelViewProjectionMatrix * position;
