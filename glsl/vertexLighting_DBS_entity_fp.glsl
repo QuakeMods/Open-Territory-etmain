@@ -133,7 +133,7 @@ void	main()
 #endif
 
 #if defined(r_ParallaxMapping)
-	if(bool(u_ParallaxMapping))
+#if defined(USE_PARALLAX_MAPPING)
 	{
 		// ray intersect in view direction
 		
@@ -153,7 +153,7 @@ void	main()
 		// size and start position of search in texture space
 		vec2 S = V.xy * -u_DepthScale / V.z;
 			
-#if 1
+#if 0
 		vec2 texOffset = vec2(0.0);
 		for(int i = 0; i < 4; i++) {
 			vec4 Normal = texture2D(u_NormalMap, texNormal.st + texOffset);
@@ -170,7 +170,7 @@ void	main()
 		texDiffuse.st += texOffset;
 		texNormal.st += texOffset;
 		texSpecular.st += texOffset;
-	}
+#endif // USE_PARALLAX_MAPPING
 #endif
 
 	// compute the diffuse term

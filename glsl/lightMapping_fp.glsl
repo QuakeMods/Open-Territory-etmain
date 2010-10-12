@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2008-2009 Robert Beckebans <trebor_7@users.sourceforge.net>
+Copyright (C) 2008-2010 Robert Beckebans <trebor_7@users.sourceforge.net>
 
 This file is part of XreaL source code.
 
@@ -34,6 +34,8 @@ void	main()
 {
 	// compute the diffuse term
 	vec4 diffuse = texture2D(u_DiffuseMap, var_TexDiffuse);
+	
+#if defined(USE_ALPHA_TESTING)
 	if(u_AlphaTest == ATEST_GT_0 && diffuse.a <= 0.0)
 	{
 		discard;
@@ -49,6 +51,7 @@ void	main()
 		discard;
 		return;
 	}
+#endif
 
 #if defined(r_showLightMaps)
 	gl_FragColor = texture2D(u_LightMap, var_TexLight);
@@ -59,5 +62,6 @@ void	main()
 	diffuse.rgb *= lightColor;
 	
 	gl_FragColor = diffuse;
+	//gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), diffuse.a);
 #endif
 }
