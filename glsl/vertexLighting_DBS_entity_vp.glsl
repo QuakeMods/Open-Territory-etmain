@@ -76,15 +76,23 @@ void	main()
 
 #if defined(USE_VERTEX_SKINNING)
 	{
-		#if defined(r_NormalMapping)
-		VertexSkinning_P_TBN(	attr_BoneIndexes, attr_BoneWeights, u_BoneMatrix,
-								attr_Position, attr_Tangent, attr_Binormal, attr_Normal,
-								position, tangent, binormal, normal);
-		#else
-		VertexSkinning_P_N(	attr_BoneIndexes, attr_BoneWeights, u_BoneMatrix,
-							attr_Position, attr_Normal,
-							position, normal);
-		#endif
+		position = vec4(0.0);
+
+		for(int i = 0; i < 4; i++)
+		{
+			int boneIndex = int(attr_BoneIndexes[i]);
+			float boneWeight = attr_BoneWeights[i];
+			mat4  boneMatrix = u_BoneMatrix[boneIndex];
+			
+			position += (boneMatrix * attr_Position) * boneWeight;
+			
+			#if defined(r_NormalMapping)
+			tangent += (boneMatrix * vec4(attr_Tangent, 0.0)).xyz * boneWeight;
+			binormal += (boneMatrix * vec4(attr_Binormal, 0.0)).xyz * boneWeight;
+			#endif
+			
+			normal += (boneMatrix * vec4(attr_Normal, 0.0)).xyz * boneWeight;
+		}
 	}
 #elif defined(USE_VERTEX_ANIMATION)
 	{

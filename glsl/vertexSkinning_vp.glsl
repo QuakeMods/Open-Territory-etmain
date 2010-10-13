@@ -21,6 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // vertexSkinning_vp.glsl - GPU vertex skinning for skeletal meshes
 
+/*
+DON'T USE THIS CODE WITH ATI CARDS:   IT CAN FREEZE THE SYSTEM
+
 void VertexSkinning_P_N(const vec4 boneIndexes,
 						const vec4 boneWeights,
 						const mat4 boneMatrices[MAX_GLSL_BONES],
@@ -79,5 +82,5 @@ void VertexSkinning_P_TBN(	const vec4 boneIndexes,
 		normal += (boneMatrix * vec4(inNormal, 0.0)).xyz * boneWeight;
 	}	
 }
-
+*/
 
