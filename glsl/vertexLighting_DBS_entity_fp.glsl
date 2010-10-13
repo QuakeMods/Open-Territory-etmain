@@ -176,7 +176,7 @@ void	main()
 	// compute the diffuse term
 	vec4 diffuse = texture2D(u_DiffuseMap, texDiffuse);
 	
-#if defined(USE_ALPHA_TEST)
+#if defined(USE_ALPHA_TESTING)
 	if(u_AlphaTest == ATEST_GT_0 && diffuse.a <= 0.0)
 	{
 		discard;
@@ -251,6 +251,10 @@ void	main()
 	
 	gl_FragColor = vec4(diffuse.rgb * (u_AmbientColor + u_LightColor * NL), diffuse.a);
 	//gl_FragColor = vec4(vec3(NL, NL, NL), diffuse.a);
-	//gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), diffuse.a);
+
+//#if defined(USE_DEFORM_VERTEXES)
+//	gl_FragColor = vec4(vec3(1.0, 0.0, 0.0), diffuse.a);
+//#endif
+	
 #endif
 }
