@@ -6,7 +6,7 @@ models/ammo/rocket/rockflar
 {
 	cull disable
 	{
-		map models/ammo/rocket/rockflar.tga
+		map models/ammo/rocket/rockflar
 		blendfunc GL_ONE GL_ONE
 	}
 }
@@ -15,21 +15,21 @@ models/ammo/rocket/rockfls2
 {
 	cull disable
 	{
-		map models/ammo/rocket/rockfls2.tga
+		map models/ammo/rocket/rockfls2
 		blendfunc GL_ONE GL_ONE
 	}
 }
 
-models/ammo/grenade 
-{ 
-     { 
-          map textures/effects/envmap_slate.tga 
-          rgbGen lightingdiffuse 
-          tcGen environment 
-     } 
-     { 
-          map models/weapons2/grenade/grenade_yd.tga 
-          blendFunc GL_ONE GL_ONE_MINUS_SRC_ALPHA 
-          rgbGen lightingdiffuse 
-     } 
+models/ammo/grenade
+{
+	diffuseMap		models/weapons2/grenade/grenade_yd
+	specularMap		models/weapons2/grenade/grenade_yd
+	normalMap		_flat
+	{
+		maskAlpha
+		stage		reflectionMap
+		map		_autocube
+		blend		GL_ONE_MINUS_DST_ALPHA, GL_ONE
+	}
+	normalMap		_flat
 }
