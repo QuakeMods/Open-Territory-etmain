@@ -1,2 +1,2 @@
 # Open Territory / etmain folder
-Open Territory main repo with full description: https://github.com/Maxxiii/Open-Territory
+Open Territory main repo with full description: https://github.com/QuakeEngines/Open-Territory
